@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { PrismaService } from './shared/services/prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {

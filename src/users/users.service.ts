@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/shared/services/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { ConflictException } from '@nestjs/common/exceptions';
+import { Password } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,9 @@ export class UsersService {
     });
   }
 
-  public getByEmail(email: User['email']): Promise<User | null> {
+  public getByEmail(
+    email: User['email'],
+  ): Promise<(User & { password: Password }) | null> {
     return this.prismaService.user.findUnique({
       where: { email },
       include: { password: true },
@@ -25,7 +28,7 @@ export class UsersService {
   }
 
   public async create(
-    userData: Omit<User, 'id'>,
+    userData: Omit<User, 'id' | 'role'>,
     password: string,
   ): Promise<User> {
     try {
