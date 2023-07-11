@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Book } from '@prisma/client';
+import { Book, User } from '@prisma/client';
 import { ConflictException } from '@nestjs/common';
 
 @Injectable()
@@ -64,5 +64,26 @@ export class BooksService {
     return this.prismaService.book.delete({
       where: { id },
     });
+  }
+
+  public async like(bookId: Book['id'], userId: User['id']): Promise<Book> {
+    try {
+      return await this.prismaService.book.update({
+        where: { id: bookId },
+        data: {
+          users: {
+            create: {
+              user: {
+                connect: { id: userId },
+              },
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (err.code === 'P2002')
+        throw new ConflictException('You have already liked this book');
+      throw err;
+    }
   }
 }
